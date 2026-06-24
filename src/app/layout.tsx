@@ -1,5 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Sarabun } from "next/font/google";
 import "./globals.css";
+
+const sarabun = Sarabun({
+  subsets: ["thai", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sarabun",
+});
 
 export const metadata: Metadata = {
   title: "TennisRecap",
@@ -18,13 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen bg-tennis-gray">
+      <body
+        className={`min-h-screen bg-tennis-gray ${sarabun.variable}`}
+      >
         <div className="mx-auto max-w-md bg-tennis-white min-h-screen shadow-lg relative">
           {children}
         </div>

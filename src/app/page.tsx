@@ -21,12 +21,12 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>("today");
   const [notes, setNotes] = useState<PrivateNote[]>(initialPrivateNotes);
 
-  const handleCheckIn = useCallback((chip: CheckInChip) => {
+  const handleCheckIn = useCallback((_chip: CheckInChip) => {
     // In a real app this would update state/mock data
     // For MVP mock, just acknowledge the tap
   }, []);
 
-  const handleSaveDecision = useCallback((planId: "A" | "B" | "C") => {
+  const handleSaveDecision = useCallback((_planId: "A" | "B" | "C") => {
     // In a real app this would persist the decision
     // For MVP mock, just acknowledge the save
   }, []);
