@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-tennis-green: #2e7d32;
+  --color-tennis-green-light: #a5d6a7;
+  --color-tennis-green-bg: #e8f5e9;
+  --color-tennis-blue: #0077b6;
+  --color-tennis-blue-light: #caf0f8;
+  --color-tennis-yellow: #ffb703;
+  --color-tennis-yellow-light: #fff3cd;
+  --color-tennis-clay: #e07a5f;
+  --color-tennis-gray: #f5f5f5;
+  --color-tennis-gray-dark: #6b7280;
+  --color-tennis-white: #ffffff;
+
+  --font-sans: "Sarabun", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  background-color: var(--color-tennis-gray);
+  color: #1f2937;
+}
