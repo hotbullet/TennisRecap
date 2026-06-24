@@ -20,4 +20,11 @@ body {
   font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
   background-color: var(--color-tennis-gray);
   color: #1f2937;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch target minimum for interactive elements */
+button,
+a {
+  touch-action: manipulation;
 }

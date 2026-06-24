@@ -8,57 +8,82 @@ interface FamilyPlanRoomProps {
   onSaveDecision: (planId: "A" | "B" | "C") => void;
 }
 
+const ROLE_EMOJI: Record<string, string> = {
+  พ่อ: "👨",
+  แม่: "👩",
+  นักกีฬา: "🧒",
+  โค้ช: "🧢",
+};
+
 export default function FamilyPlanRoom({ proposal, onSaveDecision }: FamilyPlanRoomProps) {
   const [savedPlan, setSavedPlan] = useState<"A" | "B" | "C" | null>(
     proposal.savedDecision
   );
 
-  const handleSave = (planId: "A" | "B" | "C") => {
+  const handleSelect = (planId: "A" | "B" | "C") => {
     setSavedPlan(planId);
-    onSaveDecision(planId);
+  };
+
+  const handleSave = () => {
+    if (savedPlan) {
+      onSaveDecision(savedPlan);
+    }
   };
 
   const { tournament, reactions, comparisons } = proposal;
 
   return (
-    <div className="p-4 space-y-4 pb-20">
+    <div className="px-3 py-3 space-y-3 pb-20">
       <h2 className="text-lg font-bold text-tennis-green">👨‍👩‍👧 Family Plan Room</h2>
 
       {/* Proposal Card */}
-      <div className="bg-tennis-blue-light rounded-2xl p-4">
-        <p className="text-xs text-tennis-blue font-medium">ข้อเสนอ</p>
-        <p className="font-bold text-sm mt-1">
-          เพิ่ม {tournament.name} {tournament.startDate} – {tournament.endDate} ?
+      <div className="bg-tennis-blue-light rounded-2xl px-3 py-3">
+        <p className="text-[11px] text-tennis-blue font-semibold uppercase tracking-wide">
+          ข้อเสนอ
         </p>
-        <p className="text-xs text-tennis-gray-dark mt-1">{tournament.venue}</p>
-        <p className="text-xs text-tennis-gray-dark mt-1">
-          ระดับ {tournament.level} • {tournament.days} วัน
+        <p className="font-bold text-[13px] text-tennis-blue mt-1 leading-snug">
+          เพิ่ม {tournament.name}
+          <br />
+          {tournament.startDate} – {tournament.endDate} ?
         </p>
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+          <p className="text-[11px] text-tennis-gray-dark">
+            📍 {tournament.venue}
+          </p>
+          <p className="text-[11px] text-tennis-gray-dark">
+            ระดับ {tournament.level} &middot; {tournament.days} วัน
+          </p>
+        </div>
       </div>
 
       {/* Family Reactions */}
       <div>
-        <p className="text-xs font-medium text-tennis-gray-dark mb-2">
+        <p className="text-[11px] font-semibold text-tennis-gray-dark uppercase tracking-wide mb-1.5 px-0.5">
           ความเห็นครอบครัว
         </p>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {reactions.map((reaction) => (
             <div
               key={reaction.member.id}
-              className="bg-white border border-gray-200 rounded-xl p-3 flex items-start gap-3"
+              className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex items-start gap-2.5"
             >
-              <div className="w-10 h-10 rounded-full bg-tennis-green-bg flex items-center justify-center text-lg flex-shrink-0">
-                {reaction.member.avatarUrl ? "🙂" : "🧑"}
+              <div
+                className="w-9 h-9 rounded-full bg-tennis-gray flex items-center justify-center text-base flex-shrink-0"
+                aria-label={reaction.member.name}
+              >
+                {ROLE_EMOJI[reaction.member.role] || "🧑"}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">{reaction.member.name}</p>
-                  <span className="text-xs text-tennis-gray-dark">
-                    ({reaction.member.role})
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-[13px] font-semibold leading-tight">
+                    {reaction.member.name}
+                  </p>
+                  <span className="text-[10px] text-tennis-gray-dark bg-tennis-gray px-1.5 py-0.5 rounded-full">
+                    {reaction.member.role}
                   </span>
                 </div>
                 <p
-                  className={`text-xs font-medium mt-1 inline-block px-2 py-0.5 rounded-full ${
+                  className={`text-[10px] font-semibold mt-1 inline-block px-2 py-0.5 rounded-full ${
                     reaction.reaction === "เห็นด้วย" || reaction.reaction === "อยากแข่ง"
                       ? "bg-tennis-green-bg text-tennis-green"
                       : reaction.reaction === "แนะนำ Match Simulation"
@@ -68,7 +93,7 @@ export default function FamilyPlanRoom({ proposal, onSaveDecision }: FamilyPlanR
                 >
                   {reaction.reaction}
                 </p>
-                <p className="text-xs text-tennis-gray-dark mt-1">
+                <p className="text-[11px] text-tennis-gray-dark mt-1 leading-snug">
                   {reaction.comment}
                 </p>
               </div>
@@ -79,16 +104,16 @@ export default function FamilyPlanRoom({ proposal, onSaveDecision }: FamilyPlanR
 
       {/* Plan Comparisons */}
       <div>
-        <p className="text-xs font-medium text-tennis-gray-dark mb-2">
+        <p className="text-[11px] font-semibold text-tennis-gray-dark uppercase tracking-wide mb-1.5 px-0.5">
           เปรียบเทียบแผน
         </p>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {comparisons.map((plan) => (
             <PlanCard
               key={plan.id}
               plan={plan}
               isSelected={savedPlan === plan.id}
-              onSelect={() => handleSave(plan.id)}
+              onSelect={() => handleSelect(plan.id)}
             />
           ))}
         </div>
@@ -96,15 +121,17 @@ export default function FamilyPlanRoom({ proposal, onSaveDecision }: FamilyPlanR
 
       {/* Save Button */}
       <button
-        onClick={() => savedPlan && handleSave(savedPlan)}
+        onClick={handleSave}
         disabled={!savedPlan}
-        className={`w-full py-3 rounded-xl text-sm font-bold min-h-[48px] transition-colors ${
+        className={`w-full py-3 rounded-xl text-[13px] font-bold min-h-[48px] transition-all active:scale-[0.98] ${
           savedPlan
-            ? "bg-tennis-green text-white hover:bg-tennis-green/90"
+            ? "bg-tennis-green text-white hover:bg-tennis-green/90 shadow-sm"
             : "bg-tennis-gray text-tennis-gray-dark cursor-not-allowed"
         }`}
       >
-        {savedPlan ? "📝 บันทึกการตัดสินใจ" : "เลือกแผนก่อนบันทึก"}
+        {savedPlan
+          ? `📝 บันทึกการตัดสินใจ (${savedPlan === "A" ? "Plan A" : savedPlan === "B" ? "Plan B" : "Plan C"})`
+          : "เลือกแผนก่อนบันทึก"}
       </button>
     </div>
   );
@@ -126,50 +153,72 @@ function PlanCard({
       ? "text-tennis-yellow"
       : "text-tennis-green";
 
+  const riskBg =
+    plan.recoveryRisk === "high"
+      ? "bg-red-50"
+      : plan.recoveryRisk === "medium"
+      ? "bg-tennis-yellow-light"
+      : "bg-tennis-green-bg";
+
+  const riskLabel =
+    plan.recoveryRisk === "high"
+      ? "สูง"
+      : plan.recoveryRisk === "medium"
+      ? "กลาง"
+      : "ต่ำ";
+
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left rounded-2xl p-4 border-2 transition-colors ${
+      className={`w-full text-left rounded-2xl px-3 py-3 border-2 transition-all active:scale-[0.98] ${
         isSelected
-          ? "border-tennis-green bg-tennis-green-bg"
-          : "border-gray-200 bg-white"
+          ? "border-tennis-green bg-tennis-green-bg shadow-sm"
+          : "border-gray-200 bg-white hover:border-gray-300"
       }`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-bold text-sm">{plan.name}</h3>
+      <div className="flex items-center justify-between mb-1.5">
+        <h3 className="font-bold text-[13px] leading-tight">{plan.name}</h3>
         {isSelected && (
-          <span className="text-tennis-green text-lg">✅</span>
+          <span className="text-tennis-green text-lg flex-shrink-0 ml-2">✅</span>
         )}
       </div>
-      <p className="text-xs text-tennis-gray-dark mb-3">{plan.description}</p>
+      <p className="text-[11px] text-tennis-gray-dark mb-2.5 leading-snug">
+        {plan.description}
+      </p>
 
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        <div className="bg-tennis-gray rounded-lg p-2 text-center">
-          <p className="text-xs text-tennis-gray-dark">Readiness</p>
-          <p className="font-bold text-sm">{plan.readiness}%</p>
+      <div className="grid grid-cols-3 gap-1.5 mb-2.5">
+        <div className="bg-tennis-gray rounded-lg px-2 py-1.5 text-center">
+          <p className="text-[10px] text-tennis-gray-dark">Readiness</p>
+          <p className="font-bold text-[13px] mt-0.5">{plan.readiness}%</p>
         </div>
-        <div className="bg-tennis-gray rounded-lg p-2 text-center">
-          <p className="text-xs text-tennis-gray-dark">วันซ้อม</p>
-          <p className="font-bold text-sm">{plan.trainingDays}</p>
+        <div className="bg-tennis-gray rounded-lg px-2 py-1.5 text-center">
+          <p className="text-[10px] text-tennis-gray-dark">วันซ้อม</p>
+          <p className="font-bold text-[13px] mt-0.5">{plan.trainingDays}</p>
         </div>
-        <div className="bg-tennis-gray rounded-lg p-2 text-center">
-          <p className="text-xs text-tennis-gray-dark">ความเสี่ยง</p>
-          <p className={`font-bold text-sm ${riskColor}`}>
-            {plan.recoveryRisk === "high" ? "สูง" : plan.recoveryRisk === "medium" ? "กลาง" : "ต่ำ"}
+        <div className={`${riskBg} rounded-lg px-2 py-1.5 text-center`}>
+          <p className="text-[10px] text-tennis-gray-dark">ความเสี่ยง</p>
+          <p className={`font-bold text-[13px] ${riskColor} mt-0.5`}>
+            {riskLabel}
           </p>
         </div>
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         {plan.pros.map((pro, i) => (
-          <div key={`pro-${i}`} className="flex items-start gap-1 text-xs">
-            <span className="text-tennis-green">✅</span>
+          <div
+            key={`pro-${i}`}
+            className="flex items-start gap-1.5 text-[11px] leading-snug"
+          >
+            <span className="text-tennis-green flex-shrink-0 mt-px">✅</span>
             <span>{pro}</span>
           </div>
         ))}
         {plan.cons.map((con, i) => (
-          <div key={`con-${i}`} className="flex items-start gap-1 text-xs">
-            <span className="text-red-500">❌</span>
+          <div
+            key={`con-${i}`}
+            className="flex items-start gap-1.5 text-[11px] leading-snug"
+          >
+            <span className="text-red-500 flex-shrink-0 mt-px">❌</span>
             <span>{con}</span>
           </div>
         ))}
