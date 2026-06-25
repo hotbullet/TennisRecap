@@ -10,7 +10,7 @@ import type {
 } from "@/lib/types";
 import BottomNav from "@/components/app-shell/bottom-nav";
 import TodayDashboard from "@/components/today/today-dashboard";
-import ExpandedPlanView from "@/components/timeline/expanded-plan-view";
+import PlanCalendarView from "@/components/timeline/plan-calendar-view";
 import FamilyPlanRoom from "@/components/family/family-plan-room";
 import InvestmentView from "@/components/investment/investment-view";
 import PrivateNoteView from "@/components/private-note/private-note-view";
@@ -278,7 +278,7 @@ export default function HomePage() {
       )}
 
       {activeTab === "timeline" && (
-        <ExpandedPlanView
+        <PlanCalendarView
           plan={fourteenDayPlan}
           planActivities={planActivities}
           onAddActivity={handleAddPlanActivity}
