@@ -4,7 +4,9 @@ export type ActivityType =
   | "recovery"
   | "match-sim"
   | "school"
-  | "tournament";
+  | "tournament"
+  | "travel"
+  | "rest";
 
 export type CheckInChip =
   | "ซ้อมดี"
@@ -33,6 +35,113 @@ export type TabId =
   | "family"
   | "investment"
   | "notes";
+
+// ===== NEW MVP DATA MODELS =====
+
+export type EntryType =
+  | "training"
+  | "match"
+  | "tournament"
+  | "fitness_entry"
+  | "recovery_entry";
+
+export type Mood =
+  | "good"
+  | "okay"
+  | "tired"
+  | "stressed"
+  | "confident"
+  | "frustrated";
+
+export type Soreness = "none" | "low" | "medium" | "high";
+
+export type HeatLevel = "normal" | "hot" | "very_hot";
+
+export type BallCondition =
+  | "normal"
+  | "new_ball"
+  | "different_brand"
+  | "heavy_ball"
+  | "old_ball";
+
+export type OpponentLevel = "easier" | "same" | "stronger" | "older" | "unknown";
+
+export type ResultType = "win" | "loss" | "practice_only" | "not_scored";
+
+export type EntryVisibility =
+  | "private"
+  | "family"
+  | "coach"
+  | "summary_only";
+
+export type PlanPriority = "low" | "medium" | "high";
+
+export interface AthleteProfile {
+  id: string;
+  name: string;
+  ageGroup: string;
+  dominantHand: "left" | "right";
+  mainGoal: string;
+  nextTournamentName: string;
+  nextTournamentDate: string;
+}
+
+export interface TrainingEntry {
+  id: string;
+  date: string;
+  type: EntryType;
+  durationMinutes: number;
+  intensityRpe: number;
+  energyBefore: number;
+  energyAfter: number;
+  mood: Mood;
+  sleepQuality: number;
+  soreness: Soreness;
+  heatLevel: HeatLevel;
+  ballCondition: BallCondition;
+  opponentLevel: OpponentLevel;
+  resultType: ResultType;
+  scoreText: string;
+  focusTags: string[];
+  strengthTags: string[];
+  weaknessTags: string[];
+  triggerTags: string[];
+  whatWentWell: string;
+  whatNeedsWork: string;
+  parentNote: string;
+  athletePrivateNote: string;
+  visibility: EntryVisibility;
+}
+
+export interface PlanActivity {
+  id: string;
+  date: string;
+  title: string;
+  type: ActivityType;
+  durationMinutes: number;
+  priority: PlanPriority;
+  costEstimate: number;
+  purpose: string;
+  expectedBenefit: string;
+  risk: string;
+  /** Optional extended fields for calendar views */
+  startDate?: string;
+  endDate?: string;
+  timeOfDay?: string;
+  isTournamentBlock?: boolean;
+}
+
+export interface StrengthWeaknessInsight {
+  label: string;
+  category: "strength" | "weakness" | "trigger" | "condition";
+  score: number;
+  evidenceCount: number;
+  relatedTags: string[];
+  explanation: string;
+  recommendation: string;
+}
+
+// ===== LEGACY TYPES (preserved for backward compat) =====
 
 export interface Athlete {
   id: string;
