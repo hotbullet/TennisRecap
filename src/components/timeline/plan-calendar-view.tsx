@@ -590,9 +590,18 @@ export default function PlanCalendarView({
 
           {/* Weekly Summary Card */}
           <div className="bg-gradient-to-br from-tennis-green-bg to-blue-50 rounded-2xl border border-tennis-green/20 p-4 space-y-3">
-            <p className="text-[13px] font-bold text-tennis-green">
-              📊 สรุปสัปดาห์
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📊</span>
+              <div>
+                <p className="text-[14px] font-bold text-tennis-green">
+                  สรุปสัปดาห์
+                </p>
+                <p className="text-[10px] text-tennis-gray-dark">
+                  สำหรับการตัดสินใจของนักกีฬาและผู้ปกครอง
+                </p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               <SummaryMetric
                 label="โหลดรวม"
@@ -620,21 +629,22 @@ export default function PlanCalendarView({
                 }
               />
               <SummaryMetric
-                label="ค่าใช้จ่าย"
+                label="ค่าใช้จ่ายประมาณ"
                 value={`฿${weekSummary.totalCost.toLocaleString()}`}
                 color="text-tennis-clay"
               />
             </div>
 
+            {/* Decision helper verdict */}
             <div
-              className={`rounded-xl px-3 py-2.5 text-center ${
+              className={`rounded-xl px-3 py-3 text-center space-y-1 ${
                 weekSummary.balanced
                   ? "bg-tennis-green-bg border border-tennis-green/30"
                   : "bg-red-50 border border-red-200"
               }`}
             >
               <p
-                className={`text-[12px] font-semibold ${
+                className={`text-[13px] font-bold ${
                   weekSummary.balanced
                     ? "text-tennis-green"
                     : "text-red-600"
@@ -643,6 +653,22 @@ export default function PlanCalendarView({
                 {weekSummary.balanced ? "✅ " : "⚠️ "}
                 {weekSummary.recommendation}
               </p>
+              {weekSummary.balanced ? (
+                <p className="text-[10px] text-tennis-gray-dark leading-snug">
+                  จำนวนวันหนักและ recovery อยู่ในเกณฑ์เหมาะสม —{" "}
+                  นักกีฬาพร้อมซ้อมต่อเนื่อง
+                </p>
+              ) : (
+                <p className="text-[10px] text-red-500 leading-snug">
+                  {weekSummary.intenseDays > 3
+                    ? "มีวันโหลดหนักมากเกินไป "
+                    : ""}
+                  {weekSummary.recoveryDays < 1
+                    ? "ไม่มีวัน recovery เลย "
+                    : ""}
+                  — เสี่ยงล้าและบาดเจ็บ ควรปรับแผนก่อนเริ่มสัปดาห์
+                </p>
+              )}
             </div>
           </div>
 
@@ -666,19 +692,25 @@ export default function PlanCalendarView({
                 day.activities.length === 0 &&
                 extraActivities.length === 0;
               const isHeavy = totalMinutes > 300;
+              const isLight = totalMinutes > 0 && totalMinutes <= 120;
+              const isMedium = totalMinutes > 120 && totalMinutes <= 300;
               const isRecovery =
                 day.activities.some((a) => a.type === "recovery") ||
                 extraActivities.some((pa) => pa.type === "recovery");
+
+              // Load bar percentage (max at 600 min = 10 hrs)
+              const loadPercent = Math.min((totalMinutes / 600) * 100, 100);
 
               return (
                 <div
                   key={day.date}
                   className={`rounded-xl border-2 px-3 py-2.5 ${
                     isToday
-                      ? "border-tennis-green bg-white shadow-sm"
+                      ? "border-tennis-green bg-white shadow-md"
                       : "border-gray-200 bg-white"
                   }`}
                 >
+                  {/* Day header */}
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
@@ -697,10 +729,19 @@ export default function PlanCalendarView({
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {isHeavy && (
-                        <span className="text-[9px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded-full font-semibold">
-                          ⚠️ หนัก
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {/* Load level chip */}
+                      {!isRest && (
+                        <span
+                          className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold ${
+                            isHeavy
+                              ? "bg-red-50 text-red-500"
+                              : isMedium
+                              ? "bg-yellow-50 text-yellow-600"
+                              : "bg-blue-50 text-blue-600"
+                          }`}
+                        >
+                          {isHeavy ? "หนัก" : isMedium ? "ปานกลาง" : "เบา"}
                         </span>
                       )}
                       {isRecovery && (
@@ -741,12 +782,33 @@ export default function PlanCalendarView({
                     ))}
                   </div>
 
-                  {/* Load + cost bar */}
-                  <div className="flex items-center justify-between text-[10px] text-tennis-gray-dark">
-                    <span>
+                  {/* Load bar */}
+                  <div className="w-full bg-gray-100 rounded-full h-2 mb-1.5 overflow-hidden">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        isHeavy
+                          ? "bg-red-400"
+                          : isMedium
+                          ? "bg-tennis-yellow"
+                          : isLight
+                          ? "bg-blue-400"
+                          : "bg-gray-300"
+                      }`}
+                      style={{ width: `${loadPercent}%` }}
+                    />
+                  </div>
+
+                  {/* Load + cost footer */}
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-tennis-gray-dark">
                       {totalMinutes > 0
                         ? `${totalHours} ชม. ${remainMins} นาที`
                         : "ไม่มีโหลด"}
+                      {isHeavy && (
+                        <span className="ml-1 text-red-500 font-semibold">
+                          ⚠️ เสี่ยงล้า
+                        </span>
+                      )}
                     </span>
                     {dayCost > 0 && (
                       <span className="text-tennis-clay font-semibold">
@@ -761,10 +823,28 @@ export default function PlanCalendarView({
 
           {/* Week action tips */}
           {!weekSummary.balanced && (
-            <div className="bg-tennis-yellow-light border border-tennis-yellow rounded-xl px-3 py-2 text-center">
-              <p className="text-[11px] text-yellow-700 font-semibold">
-                💡 ลองเพิ่ม recovery อีก 1–2 วัน หรือลดวันโหลดหนัก
-                เพื่อสมดุลที่ดีขึ้น
+            <div className="bg-tennis-yellow-light border border-tennis-yellow rounded-xl px-3 py-3 space-y-1.5">
+              <p className="text-[12px] font-bold text-yellow-800">
+                💡 คำแนะนำสำหรับผู้ปกครอง
+              </p>
+              <ul className="text-[11px] text-yellow-700 space-y-1 list-disc list-inside">
+                {weekSummary.intenseDays > 3 && (
+                  <li>ลดวันที่โหลดเกิน 5 ชม. ลงเหลืออย่างน้อย 1–2 วัน</li>
+                )}
+                {weekSummary.recoveryDays < 1 && (
+                  <li>เพิ่มวัน Recovery อย่างน้อย 1 วัน เพื่อให้ร่างกายฟื้นตัว</li>
+                )}
+                <li>ตรวจสอบค่าใช้จ่ายรวม — ฿
+                  {weekSummary.totalCost.toLocaleString()} ในสัปดาห์นี้</li>
+                <li>ปรึกษาโค้ชก่อนปรับแผนถ้าใกล้ถึงทัวร์นาเมนต์</li>
+              </ul>
+            </div>
+          )}
+
+          {weekSummary.balanced && (
+            <div className="bg-tennis-green-bg border border-tennis-green/20 rounded-xl px-3 py-3 text-center">
+              <p className="text-[11px] text-tennis-green font-semibold">
+                ✅ การวางแผนสัปดาห์นี้ดูดี — นักกีฬามีทั้งโหลดซ้อมและพักฟื้นที่สมดุล
               </p>
             </div>
           )}
